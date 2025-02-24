@@ -1,25 +1,26 @@
-import { RecordModel } from "pocketbase";
-import { useEffect, useState } from "react";
-import pb from "../db";
+import { BrowserRouter, Route, Routes } from "react-router";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import {
+  Authentication,
+  AuthenticationProvider,
+} from "./hooks/useAuthenticate";
+import { useState } from "react";
 
 function App() {
-  const [data, setData] = useState<RecordModel[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      const list = await pb
-        .collection("Reference")
-        .getFullList({ expand: "Book" });
-      setData(list);
-    })();
-  }, []);
+  const [authentication, setAuthentication] = useState<Authentication>(
+    {} as Authentication
+  );
 
   return (
-    <>
-      {data.length == 0
-        ? "loading"
-        : data.map((d) => <div>{JSON.stringify(d)}</div>)}
-    </>
+    <AuthenticationProvider value={{ authentication, setAuthentication }}>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthenticationProvider>
   );
 }
 
